@@ -1,23 +1,26 @@
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class CubeSpawner : MonoBehaviour
+public class CubeSpawner : Spawner<Cube>
 {
-    [SerializeField] private Cube _cube;    
-    [SerializeField] private float _repeatRate = 5f;
-    [SerializeField] private int _poolCapacity = 50;
-    [SerializeField] private int _poolMaxSize = 100;
+    [SerializeField] private float _repeatRate = 0.5f;
+    [SerializeField] private BombSpawner _bombSpawner;
 
     private ObjectPool<Cube> _pool;
 
     private void Awake()
     {
-        _pool = new ObjectPool<Cube>(CreatePooledCube, OnTakeFromPool, OnReturnToPool, OnDestroyObject, false, _poolCapacity, _poolMaxSize);
+        _pool = new ObjectPool<Cube>(CreatePooledObject, OnTakeFromPool, OnReturnToPool, OnDestroyObject, false, _poolCapacity, _poolMaxSize);
     }
 
     private void Start()
     {
         InvokeRepeating(nameof(GetCube), 0.0f, _repeatRate);
+    }
+
+    private void Update()
+    {
+        _text.text = "Cчетчик кубов " + _counter.ToString("");        
     }
 
     private void GetCube()
@@ -26,34 +29,36 @@ public class CubeSpawner : MonoBehaviour
     }
 
     private void ReturnCubeToPool(Cube instance)
-    {        
+    {
         _pool.Release(instance);
+        _bombSpawner.GetBomb(instance.transform.position);
     }
 
-    private Cube CreatePooledCube()
+    protected override Cube CreatePooledObject()
     {
-        Cube instance = Instantiate(_cube);
+        Cube instance = Instantiate(_prefab);
         instance.Disable += ReturnCubeToPool;
-        instance.gameObject.SetActive(false);    
+        instance.gameObject.SetActive(false);
+        _counter++;      
 
         return instance;
     }
 
-    private void OnTakeFromPool(Cube instance)
-    {        
-        instance.GetComponent<Renderer>().material.color = Color.white;
-        instance.transform.position = new Vector3(Random.Range(-8, 8), 15, Random.Range(-8, 8));
-        instance.RefreshCollisionStatus();        
-        instance.gameObject.SetActive(true);
+    protected override void OnDestroyObject(Cube instance)
+    {
+        Destroy(instance.gameObject);
     }
 
-    private void OnReturnToPool(Cube instance)
+    protected override void OnReturnToPool(Cube instance)
     {
         instance.gameObject.SetActive(false);
     }
 
-    private void OnDestroyObject(Cube instance)
+    protected override void OnTakeFromPool(Cube instance)
     {
-        Destroy(instance.gameObject);
+        instance.GetComponent<Renderer>().material.color = Color.white;
+        instance.transform.position = new Vector3(Random.Range(-8, 8), 15, Random.Range(-8, 8));
+        instance.RefreshCollisionStatus();
+        instance.gameObject.SetActive(true);
     }
 }

@@ -1,17 +1,16 @@
 using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using System;
 
 [RequireComponent(typeof(Renderer))]
 public class Cube : MonoBehaviour
-{   
-    public delegate void OnDisableCallback(Cube instance);
-    public OnDisableCallback Disable;
-    
-    private bool _isFirstlyCollided = true;
-    private Coroutine _coroutine;
+{        
+    private bool _isFirstlyCollided = true;    
     private float _minDelay = 2f;
     private float _maxDelay = 5f;
+
+    public event Action<Cube> Disable;
 
     public void RefreshCollisionStatus()
     {
@@ -22,19 +21,19 @@ public class Cube : MonoBehaviour
     {        
         if(collision.gameObject.TryGetComponent(out Platform platform) && _isFirstlyCollided)
         {
-                GetComponent<Renderer>().material.color = new Color(Random.value, Random.value, Random.value);
-                _isFirstlyCollided = false;
+              GetComponent<Renderer>().material.color = new Color(Random.value, Random.value, Random.value);
+              _isFirstlyCollided = false;
 
-                float delay = Random.Range(_minDelay, _maxDelay);
-                WaitForSeconds wait = new WaitForSeconds(delay);                           
-                
-                _coroutine = StartCoroutine(DisableCube(wait));                         
+              float delay = Random.Range(_minDelay, _maxDelay);
+              WaitForSeconds wait = new WaitForSeconds(delay);
+
+              Coroutine _coroutine = StartCoroutine(DisableCube(wait));                         
         }            
     }
 
     private IEnumerator DisableCube(WaitForSeconds wait)
     {        
-        yield return wait; 
-        Disable?.Invoke(this);            
+        yield return wait;        
+        Disable?.Invoke(this);
     }
 }
