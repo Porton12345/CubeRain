@@ -1,8 +1,9 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Color = UnityEngine.Color;
 
+[RequireComponent(typeof(Renderer))]
 public class Bomb : MonoBehaviour
 {  
     private float _minDelay = 2f;
@@ -13,13 +14,16 @@ public class Bomb : MonoBehaviour
     private float delay;
     private float _upwardsModifier = 3f;   
     private float _force = 250f;
+    private Color color;
 
     public event Action<Bomb> Disable;
-
-    private void Start()
+    
+    private void OnEnable()
     {
         _renderer = GetComponent<Renderer>();
-
+        color = Color.black;
+        color.a = 1;
+        _renderer.material.color = color;
         delay = UnityEngine.Random.Range(_minDelay, _maxDelay);
         WaitForSeconds wait = new WaitForSeconds(delay);
 
@@ -28,9 +32,9 @@ public class Bomb : MonoBehaviour
 
     void Update()
     {
-        _timer += Time.deltaTime;
-        float alpha = 1 - (_timer / delay);
-        Color color = _renderer.material.color;
+        _timer += Time.deltaTime;        
+        float alpha = Mathf.Log(delay/_timer);        
+        color = _renderer.material.color;
         color.a = alpha;
         _renderer.material.color = color;   
     }        
@@ -55,7 +59,7 @@ public class Bomb : MonoBehaviour
     private IEnumerator DisableBomb(WaitForSeconds wait)
     {
         yield return wait;
-        BlowBomb();
-        Disable?.Invoke(this);
+        BlowBomb();        
+        Disable?.Invoke(this);        
     }
 }

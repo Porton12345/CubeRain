@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -5,8 +6,10 @@ public class CubeSpawner : Spawner<Cube>
 {
     [SerializeField] private float _repeatRate = 0.5f;
     [SerializeField] private BombSpawner _bombSpawner;
+    [SerializeField] private TextMeshProUGUI _activeObjectCountText;
 
-    private ObjectPool<Cube> _pool;
+    private int _activeObjectCounter = 0;
+    private ObjectPool<Cube> _pool;   
 
     private void Awake()
     {
@@ -20,7 +23,9 @@ public class CubeSpawner : Spawner<Cube>
 
     private void Update()
     {
-        _text.text = "Cчетчик кубов " + _counter.ToString("");        
+        _text.text = "Cчетчик кубов " + _counter.ToString("");
+        _activeObjectCounter = _counter + _bombSpawner.CountBombs();
+        _activeObjectCountText.text = "Cчетчик активных объектов " + _activeObjectCounter.ToString("");
     }
 
     private void GetCube()
@@ -39,7 +44,7 @@ public class CubeSpawner : Spawner<Cube>
         Cube instance = Instantiate(_prefab);
         instance.Disable += ReturnCubeToPool;
         instance.gameObject.SetActive(false);
-        _counter++;      
+        _counter++;        
 
         return instance;
     }
@@ -51,7 +56,7 @@ public class CubeSpawner : Spawner<Cube>
 
     protected override void OnReturnToPool(Cube instance)
     {
-        instance.gameObject.SetActive(false);
+        instance.gameObject.SetActive(false);        
     }
 
     protected override void OnTakeFromPool(Cube instance)
@@ -59,6 +64,6 @@ public class CubeSpawner : Spawner<Cube>
         instance.GetComponent<Renderer>().material.color = Color.white;
         instance.transform.position = new Vector3(Random.Range(-8, 8), 15, Random.Range(-8, 8));
         instance.RefreshCollisionStatus();
-        instance.gameObject.SetActive(true);
+        instance.gameObject.SetActive(true);        
     }
 }

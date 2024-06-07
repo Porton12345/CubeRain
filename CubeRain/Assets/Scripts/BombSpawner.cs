@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEngine.Pool;
 
 public class BombSpawner : Spawner<Bomb>
-{   
-    private ObjectPool<Bomb> _pool;    
+{  
+    private ObjectPool<Bomb> _pool;
+    
 
     private void Awake()
     {
@@ -12,12 +13,17 @@ public class BombSpawner : Spawner<Bomb>
 
     private void Update()
     {
-        _text.text = "Cчетчик бомб " + _counter.ToString("");
-    }    
+        _text.text = "Cчетчик бомб " + _counter.ToString("");        
+    }   
+
+    public int CountBombs()
+    {
+        return _counter;
+    }
 
     private void ReturnBombToPool(Bomb instance)
     {
-        _pool.Release(instance);
+        _pool.Release(instance);        
     }
 
     public void GetBomb(Vector3 position)
@@ -28,8 +34,7 @@ public class BombSpawner : Spawner<Bomb>
 
     protected override Bomb CreatePooledObject()
     {
-        Bomb instance = Instantiate(_prefab);
-        instance.GetComponent<Renderer>().material.color = Color.black;
+        Bomb instance = Instantiate(_prefab);        
         instance.Disable += ReturnBombToPool;
         instance.gameObject.SetActive(false);
         _counter++;
@@ -44,12 +49,11 @@ public class BombSpawner : Spawner<Bomb>
 
     protected override void OnReturnToPool(Bomb instance)
     {
-        instance.gameObject.SetActive(false);
+        instance.gameObject.SetActive(false);        
     }
 
     protected override void OnTakeFromPool(Bomb instance)
-    {
-        instance.GetComponent<Renderer>().material.color = Color.black;
-        instance.gameObject.SetActive(true);
+    {               
+        instance.gameObject.SetActive(true);        
     }
 }
