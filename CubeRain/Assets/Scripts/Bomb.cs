@@ -30,7 +30,7 @@ public class Bomb : MonoBehaviour
         Coroutine _coroutine = StartCoroutine(DisableBomb(wait));
     }
 
-    void Update()
+    private void Update()
     {
         _timer += Time.deltaTime;        
         float alpha = Mathf.Log(delay/_timer);        
