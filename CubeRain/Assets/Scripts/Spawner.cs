@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class Spawner<T> : MonoBehaviour
@@ -8,7 +9,10 @@ public abstract class Spawner<T> : MonoBehaviour
     [SerializeField] protected int _poolMaxSize = 100;
     [SerializeField] protected TextMeshProUGUI _text;
 
-    protected int _counter = 0;        
+    protected int Object—ounter = 0;
+    protected int CurrentCounter = 0;
+
+    protected abstract void ShowText();    
 
     protected abstract T CreatePooledObject();
     
@@ -16,6 +20,5 @@ public abstract class Spawner<T> : MonoBehaviour
 
     protected abstract void OnReturnToPool(T _prefab);
 
-    protected abstract void OnDestroyObject(T _prefab);
-    
+    protected abstract void OnDestroyObject(T _prefab);    
 }

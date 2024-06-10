@@ -11,32 +11,32 @@ public class Bomb : MonoBehaviour
     private float _timer = 0.0f;
     private Renderer _renderer;
     private float _explosionRadius = 500f;
-    private float delay;
+    private float _delay;
     private float _upwardsModifier = 3f;   
     private float _force = 250f;
-    private Color color;
+    private Color _color;
 
     public event Action<Bomb> Disable;
     
     private void OnEnable()
     {
         _renderer = GetComponent<Renderer>();
-        color = Color.black;
-        color.a = 1;
-        _renderer.material.color = color;
-        delay = UnityEngine.Random.Range(_minDelay, _maxDelay);
-        WaitForSeconds wait = new WaitForSeconds(delay);
+        _color = Color.black;
+        _color.a = 1;
+        _renderer.material.color = _color;
+        _delay = UnityEngine.Random.Range(_minDelay, _maxDelay);
+        WaitForSeconds wait = new WaitForSeconds(_delay);
 
-        Coroutine _coroutine = StartCoroutine(DisableBomb(wait));
+        StartCoroutine(DisableBomb(wait));
     }
 
     private void Update()
     {
         _timer += Time.deltaTime;        
-        float alpha = Mathf.Log(delay/_timer);        
-        color = _renderer.material.color;
-        color.a = alpha;
-        _renderer.material.color = color;   
+        float alpha = Mathf.Log(_delay/_timer);        
+        _color = _renderer.material.color;
+        _color.a = alpha;
+        _renderer.material.color = _color;   
     }        
 
     private void BlowBomb()

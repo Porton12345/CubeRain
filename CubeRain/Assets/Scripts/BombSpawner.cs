@@ -2,9 +2,10 @@ using UnityEngine;
 using UnityEngine.Pool;
 
 public class BombSpawner : Spawner<Bomb>
-{  
-    private ObjectPool<Bomb> _pool;
-    
+{
+    private int _currentCounter = 0;
+
+    private ObjectPool<Bomb> _pool;    
 
     private void Awake()
     {
@@ -13,13 +14,22 @@ public class BombSpawner : Spawner<Bomb>
 
     private void Update()
     {
-        _text.text = "C÷åò÷èê áîìá " + _counter.ToString("");        
-    }   
+        if(_currentCounter != ObjectÑounter)
+        {
+            ShowText();
+        }            
+    }
 
     public int CountBombs()
     {
-        return _counter;
+        return ObjectÑounter;
     }
+
+    protected override void ShowText()
+    {
+        _text.text = "C÷åò÷èê áîìá " + ObjectÑounter.ToString("");
+        _currentCounter = ObjectÑounter;
+    }     
 
     private void ReturnBombToPool(Bomb instance)
     {
@@ -37,7 +47,7 @@ public class BombSpawner : Spawner<Bomb>
         Bomb instance = Instantiate(_prefab);        
         instance.Disable += ReturnBombToPool;
         instance.gameObject.SetActive(false);
-        _counter++;
+        ObjectÑounter++;
 
         return instance;
     }

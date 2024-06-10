@@ -9,6 +9,8 @@ public class CubeSpawner : Spawner<Cube>
     [SerializeField] private TextMeshProUGUI _activeObjectCountText;
 
     private int _activeObjectCounter = 0;
+    private int _currentActiveObjectCounter = 0;
+    private int _currentCounter = 0;
     private ObjectPool<Cube> _pool;   
 
     private void Awake()
@@ -23,10 +25,13 @@ public class CubeSpawner : Spawner<Cube>
 
     private void Update()
     {
-        _text.text = "C÷åò÷èê êóáîâ " + _counter.ToString("");
-        _activeObjectCounter = _counter + _bombSpawner.CountBombs();
-        _activeObjectCountText.text = "C÷åò÷èê àêòèâíûõ îáúåêòîâ " + _activeObjectCounter.ToString("");
-    }
+        _activeObjectCounter = ObjectÑounter + _bombSpawner.CountBombs();
+
+        if (_currentCounter != ObjectÑounter || _currentActiveObjectCounter != _activeObjectCounter)
+        {
+            ShowText();
+        }
+    }   
 
     private void GetCube()
     {
@@ -39,12 +44,20 @@ public class CubeSpawner : Spawner<Cube>
         _bombSpawner.GetBomb(instance.transform.position);
     }
 
+    protected override void ShowText()
+    {
+        _text.text = "C÷åò÷èê êóáîâ " + ObjectÑounter.ToString("");
+        _activeObjectCountText.text = "C÷åò÷èê àêòèâíûõ îáúåêòîâ " + _activeObjectCounter.ToString("");
+        _currentCounter = ObjectÑounter;
+        _currentActiveObjectCounter = _activeObjectCounter;
+    }
+
     protected override Cube CreatePooledObject()
     {
         Cube instance = Instantiate(_prefab);
         instance.Disable += ReturnCubeToPool;
         instance.gameObject.SetActive(false);
-        _counter++;        
+        ObjectÑounter++;        
 
         return instance;
     }

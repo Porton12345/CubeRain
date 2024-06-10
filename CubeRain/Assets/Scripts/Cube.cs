@@ -27,7 +27,7 @@ public class Cube : MonoBehaviour
               float delay = Random.Range(_minDelay, _maxDelay);
               WaitForSeconds wait = new WaitForSeconds(delay);
 
-              Coroutine _coroutine = StartCoroutine(DisableCube(wait));                         
+              StartCoroutine(DisableCube(wait));                         
         }            
     }
 
