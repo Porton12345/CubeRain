@@ -1,16 +1,12 @@
-using TMPro;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
 
 public class CubeSpawner : Spawner<Cube>
 {
     [SerializeField] private float _repeatRate = 0.5f;
-    [SerializeField] private BombSpawner _bombSpawner;
-    [SerializeField] private TextMeshProUGUI _activeObjectCountText;
-
-    private int _activeObjectCounter = 0;
-    private int _currentActiveObjectCounter = 0;
-    private int _currentCounter = 0;
+    [SerializeField] private BombSpawner _bombSpawner;    
+       
     private ObjectPool<Cube> _pool;   
 
     private void Awake()
@@ -19,18 +15,9 @@ public class CubeSpawner : Spawner<Cube>
     }
 
     private void Start()
-    {
-        InvokeRepeating(nameof(GetCube), 0.0f, _repeatRate);
-    }
-
-    private void Update()
-    {
-        _activeObjectCounter = Object—ounter + _bombSpawner.CountBombs();
-
-        if (_currentCounter != Object—ounter || _currentActiveObjectCounter != _activeObjectCounter)
-        {
-            ShowText();
-        }
+    {       
+        WaitForSeconds wait = new WaitForSeconds(_repeatRate);
+        StartCoroutine(CreateCubeRain(wait));
     }   
 
     private void GetCube()
@@ -42,25 +29,17 @@ public class CubeSpawner : Spawner<Cube>
     {
         _pool.Release(instance);
         _bombSpawner.GetBomb(instance.transform.position);
-    }
-
-    protected override void ShowText()
-    {
-        _text.text = "C˜ÂÚ˜ËÍ ÍÛ·Ó‚ " + Object—ounter.ToString("");
-        _activeObjectCountText.text = "C˜ÂÚ˜ËÍ ‡ÍÚË‚Ì˚ı Ó·˙ÂÍÚÓ‚ " + _activeObjectCounter.ToString("");
-        _currentCounter = Object—ounter;
-        _currentActiveObjectCounter = _activeObjectCounter;
-    }
+    }     
 
     protected override Cube CreatePooledObject()
     {
         Cube instance = Instantiate(_prefab);
         instance.Disable += ReturnCubeToPool;
         instance.gameObject.SetActive(false);
-        Object—ounter++;        
+        ObjectCounter++;        
 
         return instance;
-    }
+    }    
 
     protected override void OnDestroyObject(Cube instance)
     {
@@ -74,9 +53,19 @@ public class CubeSpawner : Spawner<Cube>
 
     protected override void OnTakeFromPool(Cube instance)
     {
-        instance.GetComponent<Renderer>().material.color = Color.white;
+        instance.TryGetComponent<Renderer>(out Renderer renderer);
+        renderer.material.color = Color.white;
         instance.transform.position = new Vector3(Random.Range(-8, 8), 15, Random.Range(-8, 8));
         instance.RefreshCollisionStatus();
         instance.gameObject.SetActive(true);        
+    }
+
+    private IEnumerator CreateCubeRain(WaitForSeconds wait)
+    {
+        while (true)
+        {
+            yield return wait;
+            GetCube();
+        }        
     }
 }

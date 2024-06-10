@@ -7,8 +7,7 @@ using Color = UnityEngine.Color;
 public class Bomb : MonoBehaviour
 {  
     private float _minDelay = 2f;
-    private float _maxDelay = 5f;
-    private float _timer = 0.0f;
+    private float _maxDelay = 5f;    
     private Renderer _renderer;
     private float _explosionRadius = 500f;
     private float _delay;
@@ -28,15 +27,6 @@ public class Bomb : MonoBehaviour
         WaitForSeconds wait = new WaitForSeconds(_delay);
 
         StartCoroutine(DisableBomb(wait));
-    }
-
-    private void Update()
-    {
-        _timer += Time.deltaTime;        
-        float alpha = Mathf.Log(_delay/_timer);        
-        _color = _renderer.material.color;
-        _color.a = alpha;
-        _renderer.material.color = _color;   
     }        
 
     private void BlowBomb()
@@ -58,8 +48,21 @@ public class Bomb : MonoBehaviour
 
     private IEnumerator DisableBomb(WaitForSeconds wait)
     {
-        yield return wait;
+        StartCoroutine(FadeBomb());
+        yield return wait;        
         BlowBomb();        
-        Disable?.Invoke(this);        
+        Disable?.Invoke(this);
+    }
+
+    private IEnumerator FadeBomb()
+    {                
+        int steps = 1020;                
+
+        for(int i = 0; i < steps; i++) 
+        {            
+            _color.a = 1f-((1f/steps) * i);
+            _renderer.material.color = _color;
+            yield return null;
+        }
     }
 }
